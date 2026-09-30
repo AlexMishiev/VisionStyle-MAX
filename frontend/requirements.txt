@@ -1,0 +1,8 @@
+# --- Общее ---
+httpx==0.28.1
+python-dotenv==1.2.2
+colorlog==6.10.1
+Pillow==12.2.0
+
+# --- MAX ---
+aiohttp==3.13.5

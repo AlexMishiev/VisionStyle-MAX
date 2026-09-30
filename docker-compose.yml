@@ -1,0 +1,54 @@
+# Запуск MAX-бота в Docker.
+# Перед первым запуском скопируйте .env.docker.max.example в .env.docker.max и заполните его.
+#
+#   docker compose up -d --build                    - бот в режиме polling
+#   docker compose --profile webhook up -d --build  - бот вместе с nginx и certbot для режима webhook
+#   docker compose logs -f max                      - смотреть логи
+#   docker compose --profile webhook down           - остановить всё
+
+services:
+  max:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.max
+    restart: unless-stopped
+    env_file:
+      - ./.env.docker.max
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./frontend/bot/assets:/service/bot/assets:ro
+      - ./frontend/logs:/service/logs
+
+  nginx:
+    build: ./nginx
+    profiles: ["webhook"]
+    restart: unless-stopped
+    env_file:
+      - ./.env.docker.max
+    depends_on:
+      - max
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-conf:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+
+  certbot:
+    image: certbot/certbot:latest
+    profiles: ["webhook"]
+    restart: unless-stopped
+    env_file:
+      - ./.env.docker.max
+    depends_on:
+      - nginx
+    entrypoint: ["/bin/sh", "/certbot.sh"]
+    volumes:
+      - ./nginx/certbot.sh:/certbot.sh:ro
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+
+volumes:
+  certbot-conf:
+  certbot-www:

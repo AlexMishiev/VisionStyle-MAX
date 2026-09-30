@@ -1,0 +1,21 @@
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /service
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# копируем только общий код и MAX-бота
+COPY bot/__init__.py ./bot/__init__.py
+COPY bot/common ./bot/common
+COPY bot/assets ./bot/assets
+COPY bot/max ./bot/max
+COPY run_max.py ./
+
+# настройки передаются через переменные окружения (env-файл)
+
+CMD ["python", "run_max.py"]

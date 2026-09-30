@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Виртуальное окружение
+.venv/
+.venv*/
+venv/
+
+# Настройки с токенами и паролями
+.env
+.env.*
+!.env.max.example
+!.env.docker.max.example
+
+# Логи
+logs/
+
+# IDE
+.idea/
+.vscode/
+
+# Сертификат API у каждого свой
+frontend/bot/assets/tls/cert*.pem
+/readMEto.md
